@@ -5,6 +5,7 @@ package main
 
 import (
 	"log"
+	"net"
 	"os"
 )
 
@@ -29,6 +30,14 @@ func main() {
 			os.Exit(1)
 		}
 	}
+}
+
+func getUDPAddr(address string) *net.UDPAddr {
+	udpAddr, err := net.ResolveUDPAddr("udp4", address)
+	if err != nil {
+		log.Fatalln("ERROR:", err)
+	}
+	return udpAddr
 }
 
 func hostGame() {
