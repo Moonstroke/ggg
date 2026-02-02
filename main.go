@@ -10,6 +10,7 @@ import (
 )
 
 var DEBUG = log.New(os.Stderr, "[DEBUG] ", log.Lshortfile)
+var ERROR = log.New(os.Stderr, "[ERROR] ", log.LstdFlags | log.Lshortfile)
 
 func main() {
 	/* If requested, set up a game; by default, look for one instead */
@@ -35,7 +36,7 @@ func main() {
 func getUDPAddr(address string) *net.UDPAddr {
 	udpAddr, err := net.ResolveUDPAddr("udp4", address)
 	if err != nil {
-		log.Fatalln("ERROR:", err)
+		ERROR.Fatalln(err)
 	}
 	return udpAddr
 }
