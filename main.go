@@ -14,16 +14,20 @@ func main() {
 	/* If requested, set up a game; by default, look for one instead */
 	if len(os.Args) == 1 {
 		joinGame()
-	} else if os.Args[1] == "host" {
-		hostGame()
-	} else if os.Args[1] == "join" {
-		joinGame()
 	} else {
-		DEBUG.Println("Unknown action", os.Args[1])
-		os.Stderr.WriteString("Usage: ggg ACTION?\n")
-		os.Stderr.WriteString("\twhere ACTION is either \"host\" or \"join\"\n")
-		os.Stderr.WriteString("\tif ACTION is unspecified, the default is \"join\"\n")
-		os.Exit(1)
+		action := os.Args[1]
+		switch action {
+		case "host":
+			hostGame()
+		case "join":
+			joinGame()
+		default:
+			DEBUG.Println("Unknown action", action)
+			os.Stderr.WriteString("Usage: ggg ACTION?\n")
+			os.Stderr.WriteString("\twhere ACTION is either \"host\" or \"join\"\n")
+			os.Stderr.WriteString("\tif ACTION is unspecified, the default is \"join\"\n")
+			os.Exit(1)
+		}
 	}
 }
 
