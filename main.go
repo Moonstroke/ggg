@@ -4,8 +4,11 @@
 package main
 
 import (
+	"log"
 	"os"
 )
+
+var DEBUG = log.New(os.Stderr, "[DEBUG] ", log.Lshortfile)
 
 func main() {
 	/* If requested, set up a game; by default, look for one instead */
@@ -16,6 +19,7 @@ func main() {
 	} else if os.Args[1] == "join" {
 		joinGame()
 	} else {
+		DEBUG.Println("Unknown action", os.Args[1])
 		os.Stderr.WriteString("Usage: ggg ACTION?\n")
 		os.Stderr.WriteString("\twhere ACTION is either \"host\" or \"join\"\n")
 		os.Stderr.WriteString("\tif ACTION is unspecified, the default is \"join\"\n")
@@ -24,9 +28,11 @@ func main() {
 }
 
 func hostGame() {
+	DEBUG.Println("Hosting game")
 	// TODO set up game and make available on network
 }
 
 func joinGame() {
+	DEBUG.Println("Joining game")
 	// TODO find game to join on network
 }
