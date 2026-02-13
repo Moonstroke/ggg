@@ -9,8 +9,10 @@ import (
 	"os"
 )
 
+const DEFAULT_ADDRESS = ":10042"
+
 var DEBUG = log.New(os.Stderr, "[DEBUG] ", log.Lshortfile)
-var ERROR = log.New(os.Stderr, "[ERROR] ", log.LstdFlags | log.Lshortfile)
+var ERROR = log.New(os.Stderr, "[ERROR] ", log.LstdFlags|log.Lshortfile)
 
 func main() {
 	/* If requested, set up a game; by default, look for one instead */
@@ -43,10 +45,28 @@ func getUDPAddr(address string) *net.UDPAddr {
 
 func hostGame() {
 	DEBUG.Println("Hosting game")
-	// TODO set up game and make available on network
+	remoteAddr := getUDPAddr(DEFAULT_ADDRESS)
+	conn, err := net.ListenUDP("udp4", remoteAddr)
+	if err != nil {
+		ERROR.Fatalln(err)
+	}
+	DEBUG.Println(conn.LocalAddr(), "is connected to", conn.RemoteAddr())
+	defer conn.Close()
+
+	// TODO wait for players to make themselves known => read
 }
 
 func joinGame() {
 	DEBUG.Println("Joining game")
-	// TODO find game to join on network
+	localAddr := getUDPAddr(":0")
+	remoteAddr := getUDPAddr(DEFAULT_ADDRESS)
+	DEBUG.Println("local address =", localAddr, "; remote address =", remoteAddr)
+	conn, err := net.DialUDP("udp4", localAddr, remoteAddr)
+	if err != nil {
+		ERROR.Fatalln(err)
+	}
+	DEBUG.Println(conn.LocalAddr(), "is connected to", conn.RemoteAddr())
+	defer conn.Close()
+
+	// TODO speak to hosts on network => write
 }
