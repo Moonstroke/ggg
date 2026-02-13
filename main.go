@@ -29,7 +29,7 @@ func main() {
 			joinGame()
 		default:
 			DEBUG.Println("Unknown action", action)
-			os.Stderr.WriteString("Usage: ggg ACTION?\n")
+			os.Stderr.WriteString("Usage: ggg [ACTION]\n")
 			os.Stderr.WriteString("\twhere ACTION is either \"host\" or \"join\"\n")
 			os.Stderr.WriteString("\tif ACTION is unspecified, the default is \"join\"\n")
 			os.Exit(1)
