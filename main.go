@@ -18,15 +18,22 @@ var ERROR = log.New(os.Stderr, "[ERROR] ", log.LstdFlags|log.Lshortfile)
 
 func usage() {
 	os.Stderr.WriteString("Usage: ggg [ACTION] NAME\n")
-	os.Stderr.WriteString("\twhere ACTION is either \"host\" or \"join\"\n")
+	os.Stderr.WriteString("Where:\n")
+	os.Stderr.WriteString("\tACTION is either \"host\" or \"join\"\n")
+	os.Stderr.WriteString("\tNAME is a non-empty string defining the player name\n")
 	os.Exit(1)
 }
 
 func main() {
 	/* If requested, set up a game; by default, look for one instead */
-	if len(os.Args) == 1 {
+	if len(os.Args) != 3 {
 		usage()
 	} else {
+		name := os.Args[2]
+		if name == "" {
+			DEBUG.Println("Empty name")
+			usage()
+		}
 		action := os.Args[1]
 		switch action {
 		case "host":
