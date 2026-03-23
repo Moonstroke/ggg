@@ -4,6 +4,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net"
 	"os"
@@ -12,6 +13,8 @@ import (
 
 const DEFAULT_ADDRESS = ":10042"
 const BUFFER_SIZE = 256
+
+var JOIN_MSG_FMT = "%s wants to join"
 
 var DEBUG = log.New(os.Stderr, "[DEBUG] ", log.Lshortfile)
 var ERROR = log.New(os.Stderr, "[ERROR] ", log.LstdFlags|log.Lshortfile)
@@ -88,7 +91,7 @@ func joinGame(name string) {
 	DEBUG.Println(conn.LocalAddr(), "is connected to", conn.RemoteAddr())
 	defer conn.Close()
 
-	payload := []byte(name + " wants to join")
+	payload := []byte(fmt.Sprintf(JOIN_MSG_FMT, name))
 	for {
 		_, err := conn.Write(payload)
 		if err != nil {
