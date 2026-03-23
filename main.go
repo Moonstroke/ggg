@@ -39,7 +39,7 @@ func main() {
 		case "host":
 			hostGame()
 		case "join":
-			joinGame()
+			joinGame(name)
 		default:
 			DEBUG.Println("Unknown action", action)
 			usage()
@@ -76,7 +76,7 @@ func hostGame() {
 	}
 }
 
-func joinGame() {
+func joinGame(name string) {
 	DEBUG.Println("Joining game")
 	localAddr := getUDPAddr(":0")
 	remoteAddr := getUDPAddr(DEFAULT_ADDRESS)
@@ -88,7 +88,7 @@ func joinGame() {
 	DEBUG.Println(conn.LocalAddr(), "is connected to", conn.RemoteAddr())
 	defer conn.Close()
 
-	payload := []byte("I wanna play!")
+	payload := []byte(name + " wants to join")
 	for {
 		_, err := conn.Write(payload)
 		if err != nil {
