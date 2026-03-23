@@ -16,6 +16,13 @@ const BUFFER_SIZE = 256
 var DEBUG = log.New(os.Stderr, "[DEBUG] ", log.Lshortfile)
 var ERROR = log.New(os.Stderr, "[ERROR] ", log.LstdFlags|log.Lshortfile)
 
+func usage() {
+	os.Stderr.WriteString("Usage: ggg [ACTION] NAME\n")
+	os.Stderr.WriteString("\twhere ACTION is either \"host\" or \"join\"\n")
+	os.Stderr.WriteString("\tif ACTION is unspecified, the default is \"join\"\n")
+	os.Exit(1)
+}
+
 func main() {
 	/* If requested, set up a game; by default, look for one instead */
 	if len(os.Args) == 1 {
@@ -29,10 +36,7 @@ func main() {
 			joinGame()
 		default:
 			DEBUG.Println("Unknown action", action)
-			os.Stderr.WriteString("Usage: ggg [ACTION]\n")
-			os.Stderr.WriteString("\twhere ACTION is either \"host\" or \"join\"\n")
-			os.Stderr.WriteString("\tif ACTION is unspecified, the default is \"join\"\n")
-			os.Exit(1)
+			usage()
 		}
 	}
 }
