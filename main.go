@@ -74,8 +74,13 @@ func hostGame(name string) {
 		if err != nil {
 			ERROR.Fatalln(err)
 		}
-		DEBUG.Println("Received", string(buffer[:n]), "from", addr)
-		// TODO if addr is a player, register and notify it
+		msg := string(buffer[:n])
+		DEBUG.Println("Received", msg, "from", addr)
+		var playerName string
+		if n, err = fmt.Sscanf(msg, JOIN_MSG_FMT, &playerName); err != nil {
+			ERROR.Println(err)
+			continue
+		}
 	}
 }
 
