@@ -15,6 +15,7 @@ const DEFAULT_ADDRESS = ":10042"
 const BUFFER_SIZE = 256
 
 var JOIN_MSG_FMT = "%s wants to join"
+var ACCEPT_MSG_FMT = "Welcome, %s"
 
 var DEBUG = log.New(os.Stderr, "[DEBUG] ", log.Lshortfile)
 var ERROR = log.New(os.Stderr, "[ERROR] ", log.LstdFlags|log.Lshortfile)
@@ -84,7 +85,7 @@ func hostGame(name string) {
 		if n == 1 {
 			/* Message was a join request: accept player */
 			DEBUG.Println("Acepting player", playerName)
-			conn.WriteToUDP([]byte("Welcome, "+playerName+"!"), addr)
+			conn.WriteToUDP([]byte(fmt.Sprintf(ACCEPT_MSG_FMT, playerName)), addr)
 			// TODO register {playerName, addr}
 		}
 	}
@@ -116,7 +117,7 @@ func joinGame(name string) {
 			continue
 		}
 		reply := string(buffer[:n])
-		if reply == "Welcome, "+name+"!" {
+		if reply == fmt.Sprintf(ACCEPT_MSG_FMT, name) {
 			DEBUG.Println("Join request accepted by host", conn.RemoteAddr())
 			break
 		}
