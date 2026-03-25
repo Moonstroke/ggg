@@ -103,12 +103,22 @@ func joinGame(name string) {
 	defer conn.Close()
 
 	payload := []byte(fmt.Sprintf(JOIN_MSG_FMT, name))
+	buffer := make([]byte, BUFFER_SIZE)
 	for {
 		_, err := conn.Write(payload)
 		if err != nil {
 			ERROR.Fatalln(err)
 		}
-		time.Sleep(1 * time.Second)
-		// TODO if host replies, stop sending
+		conn.SetReadDeadline(time.Now().Add(time.Second))
+		var n int
+		if n, _, err = conn.ReadFromUDP(buffer); err != nil {
+			ERROR.Println(err)
+			continue
+		}
+		reply := string(buffer[:n])
+		if reply == "Welcome, "+name+"!" {
+			DEBUG.Println("Join request accepted by host", conn.RemoteAddr())
+			break
+		}
 	}
 }
