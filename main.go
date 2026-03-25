@@ -70,7 +70,7 @@ func hostGame(name string) {
 
 	buffer := make([]byte, BUFFER_SIZE)
 	for {
-		n, addr, err := conn.ReadFrom(buffer)
+		n, addr, err := conn.ReadFromUDP(buffer)
 		if err != nil {
 			ERROR.Fatalln(err)
 		}
