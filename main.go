@@ -81,6 +81,12 @@ func hostGame(name string) {
 			ERROR.Println(err)
 			continue
 		}
+		if n == 1 {
+			/* Message was a join request: accept player */
+			DEBUG.Println("Acepting player", playerName)
+			conn.WriteToUDP([]byte("Welcome, "+playerName+"!"), addr)
+			// TODO register {playerName, addr}
+		}
 	}
 }
 
