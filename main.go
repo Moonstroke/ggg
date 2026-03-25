@@ -15,7 +15,7 @@ const DEFAULT_ADDRESS = ":10042"
 const BUFFER_SIZE = 256
 
 var JOIN_MSG_FMT = "%s wants to join"
-var ACCEPT_MSG_FMT = "Welcome, %s"
+var ACCEPT_MSG_FMT = "%s welcomes %s"
 
 var DEBUG = log.New(os.Stderr, "[DEBUG] ", log.Lshortfile)
 var ERROR = log.New(os.Stderr, "[ERROR] ", log.LstdFlags|log.Lshortfile)
@@ -85,7 +85,7 @@ func hostGame(name string) {
 		if n == 1 {
 			/* Message was a join request: accept player */
 			DEBUG.Println("Acepting player", playerName)
-			conn.WriteToUDP([]byte(fmt.Sprintf(ACCEPT_MSG_FMT, playerName)), addr)
+			conn.WriteToUDP([]byte(fmt.Sprintf(ACCEPT_MSG_FMT, name, playerName)), addr)
 			// TODO register {playerName, addr}
 		}
 	}
@@ -105,6 +105,8 @@ func joinGame(name string) {
 
 	payload := []byte(fmt.Sprintf(JOIN_MSG_FMT, name))
 	buffer := make([]byte, BUFFER_SIZE)
+	/* Dirty hack, but the only way I found to format only one flag */
+	replyFmt := fmt.Sprintf(ACCEPT_MSG_FMT, "%s", name)
 	for {
 		_, err := conn.Write(payload)
 		if err != nil {
@@ -117,8 +119,15 @@ func joinGame(name string) {
 			continue
 		}
 		reply := string(buffer[:n])
-		if reply == fmt.Sprintf(ACCEPT_MSG_FMT, name) {
-			DEBUG.Println("Join request accepted by host", conn.RemoteAddr())
+		DEBUG.Println("Received", reply, "from", conn.RemoteAddr())
+		var hostName string
+		if n, err = fmt.Sscanf(reply, replyFmt, &hostName); err != nil {
+			ERROR.Println(err)
+			continue
+		}
+		if n == 1 {
+			/* Host accepted our request */
+			DEBUG.Println("Join request accepted by host", hostName, "@", conn.RemoteAddr())
 			break
 		}
 	}
