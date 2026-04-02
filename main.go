@@ -21,7 +21,7 @@ var DEBUG = log.New(os.Stderr, "[DEBUG] ", log.Lshortfile)
 var ERROR = log.New(os.Stderr, "[ERROR] ", log.LstdFlags|log.Lshortfile)
 
 func usage() {
-	os.Stderr.WriteString("Usage: ggg [ACTION] NAME\n")
+	os.Stderr.WriteString("Usage: ggg ACTION NAME\n")
 	os.Stderr.WriteString("Where:\n")
 	os.Stderr.WriteString("\tACTION is either \"host\" or \"join\"\n")
 	os.Stderr.WriteString("\tNAME is a non-empty string defining the player name\n")
@@ -29,7 +29,6 @@ func usage() {
 }
 
 func main() {
-	/* If requested, set up a game; by default, look for one instead */
 	if len(os.Args) != 3 {
 		usage()
 	}
