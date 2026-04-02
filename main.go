@@ -106,6 +106,9 @@ func hostGame(name string, playerCount int) {
 			DEBUG.Println("Acepting player", playerName)
 			conn.WriteToUDP(fmt.Appendf(nil, ACCEPT_MSG_FMT, name, playerName), addr)
 			players = append(players, player{playerName, addr})
+			if len(players) == playerCount {
+				break
+			}
 		}
 	}
 }
