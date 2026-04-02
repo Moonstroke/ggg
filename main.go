@@ -26,8 +26,9 @@ func usage(execName string) {
 	os.Stderr.WriteString("Where:\n")
 	os.Stderr.WriteString("\tACTION is either \"host\" or \"join\"\n")
 	os.Stderr.WriteString("\tNAME is a non-empty string defining the player name\n")
-	os.Stderr.WriteString("\tPLAYER_COUNT is a positive integer specifying the number of players for the\n")
-	os.Stderr.WriteString("\t\tgame; mandatory if ACTION is \"host\", ignored otherwise\n")
+	os.Stderr.WriteString("\tPLAYER_COUNT is a positive integer greater than 1 specifying the number\n")
+	os.Stderr.WriteString("\t\tof players for the game; mandatory if ACTION is \"host\",\n")
+	os.Stderr.WriteString("\t\tignored otherwise\n")
 	os.Exit(1)
 }
 
@@ -48,7 +49,7 @@ func main() {
 			usage(os.Args[0])
 		}
 		playerCount, err := strconv.Atoi(os.Args[3])
-		if err != nil || playerCount <= 0 {
+		if err != nil || playerCount <= 1 {
 			DEBUG.Println("Invalid player count", os.Args[3])
 			usage(os.Args[0])
 		}
