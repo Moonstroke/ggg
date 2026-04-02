@@ -21,10 +21,12 @@ var DEBUG = log.New(os.Stderr, "[DEBUG] ", log.Lshortfile)
 var ERROR = log.New(os.Stderr, "[ERROR] ", log.LstdFlags|log.Lshortfile)
 
 func usage(execName string) {
-	os.Stderr.WriteString("Usage: " + execName + " ACTION NAME\n")
+	os.Stderr.WriteString("Usage: " + execName + " ACTION NAME [PLAYER_COUNT]\n")
 	os.Stderr.WriteString("Where:\n")
 	os.Stderr.WriteString("\tACTION is either \"host\" or \"join\"\n")
 	os.Stderr.WriteString("\tNAME is a non-empty string defining the player name\n")
+	os.Stderr.WriteString("\tPLAYER_COUNT is a positive integer specifying the number of players for the\n")
+	os.Stderr.WriteString("\t\tgame; mandatory if ACTION is \"host\", ignored otherwise\n")
 	os.Exit(1)
 }
 
