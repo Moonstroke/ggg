@@ -27,8 +27,8 @@ func usage(execName string) {
 	os.Stderr.WriteString("\tACTION is either \"host\" or \"join\"\n")
 	os.Stderr.WriteString("\tNAME is a non-empty string defining the player name\n")
 	os.Stderr.WriteString("\tPLAYER_COUNT is a positive integer greater than 1 specifying the number\n")
-	os.Stderr.WriteString("\t\tof players for the game; mandatory if ACTION is \"host\",\n")
-	os.Stderr.WriteString("\t\tignored otherwise\n")
+	os.Stderr.WriteString("\t             of players for the game; mandatory if ACTION is \"host\",\n")
+	os.Stderr.WriteString("\t             ignored otherwise\n")
 	os.Exit(1)
 }
 
