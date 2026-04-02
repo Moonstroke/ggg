@@ -32,6 +32,11 @@ func usage(execName string) {
 	os.Exit(1)
 }
 
+type player struct {
+	name string
+	addr net.Addr
+}
+
 func main() {
 	if len(os.Args) < 3 {
 		usage(os.Args[0])
