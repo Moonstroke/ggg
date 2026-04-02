@@ -8,6 +8,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -44,6 +45,11 @@ func main() {
 	case "host":
 		if len(os.Args) == 3 {
 			DEBUG.Println("Missing player count")
+			usage(os.Args[0])
+		}
+		playerCount, err := strconv.Atoi(os.Args[3])
+		if err != nil || playerCount <= 0 {
+			DEBUG.Println("Invalid player count", os.Args[3])
 			usage(os.Args[0])
 		}
 
