@@ -42,6 +42,11 @@ func main() {
 	action := os.Args[1]
 	switch action {
 	case "host":
+		if len(os.Args) == 3 {
+			DEBUG.Println("Missing player count")
+			usage(os.Args[0])
+		}
+
 		hostGame(name)
 	case "join":
 		joinGame(name)
