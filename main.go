@@ -20,8 +20,8 @@ var ACCEPT_MSG_FMT = "%s welcomes %s"
 var DEBUG = log.New(os.Stderr, "[DEBUG] ", log.Lshortfile)
 var ERROR = log.New(os.Stderr, "[ERROR] ", log.LstdFlags|log.Lshortfile)
 
-func usage() {
-	os.Stderr.WriteString("Usage: ggg ACTION NAME\n")
+func usage(execName string) {
+	os.Stderr.WriteString("Usage: " + execName + " ACTION NAME\n")
 	os.Stderr.WriteString("Where:\n")
 	os.Stderr.WriteString("\tACTION is either \"host\" or \"join\"\n")
 	os.Stderr.WriteString("\tNAME is a non-empty string defining the player name\n")
@@ -30,12 +30,12 @@ func usage() {
 
 func main() {
 	if len(os.Args) != 3 {
-		usage()
+		usage(os.Args[0])
 	}
 	name := os.Args[2]
 	if name == "" {
 		DEBUG.Println("Empty name")
-		usage()
+		usage(os.Args[0])
 	}
 	action := os.Args[1]
 	switch action {
@@ -45,7 +45,7 @@ func main() {
 		joinGame(name)
 	default:
 		DEBUG.Println("Unknown action", action)
-		usage()
+		usage(os.Args[0])
 	}
 }
 
