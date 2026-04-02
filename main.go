@@ -32,22 +32,21 @@ func main() {
 	/* If requested, set up a game; by default, look for one instead */
 	if len(os.Args) != 3 {
 		usage()
-	} else {
-		name := os.Args[2]
-		if name == "" {
-			DEBUG.Println("Empty name")
-			usage()
-		}
-		action := os.Args[1]
-		switch action {
-		case "host":
-			hostGame(name)
-		case "join":
-			joinGame(name)
-		default:
-			DEBUG.Println("Unknown action", action)
-			usage()
-		}
+	}
+	name := os.Args[2]
+	if name == "" {
+		DEBUG.Println("Empty name")
+		usage()
+	}
+	action := os.Args[1]
+	switch action {
+	case "host":
+		hostGame(name)
+	case "join":
+		joinGame(name)
+	default:
+		DEBUG.Println("Unknown action", action)
+		usage()
 	}
 }
 
