@@ -29,7 +29,7 @@ func usage(execName string) {
 }
 
 func main() {
-	if len(os.Args) != 3 {
+	if len(os.Args) < 3 {
 		usage(os.Args[0])
 	}
 	name := os.Args[2]
