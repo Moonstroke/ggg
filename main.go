@@ -53,7 +53,7 @@ func main() {
 			usage(os.Args[0])
 		}
 
-		hostGame(name)
+		hostGame(name, playerCount)
 	case "join":
 		joinGame(name)
 	default:
@@ -70,7 +70,7 @@ func getUDPAddr(address string) *net.UDPAddr {
 	return udpAddr
 }
 
-func hostGame(name string) {
+func hostGame(name string, playerCount int) {
 	DEBUG.Println("Hosting game")
 	remoteAddr := getUDPAddr(DEFAULT_ADDRESS)
 	conn, err := net.ListenUDP("udp4", remoteAddr)
