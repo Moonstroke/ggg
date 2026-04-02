@@ -77,7 +77,7 @@ func getUDPAddr(address string) *net.UDPAddr {
 }
 
 func hostGame(name string, playerCount int) {
-	players := make([]player, playerCount)
+	players := make([]player, 0, playerCount)
 	DEBUG.Println("Hosting game")
 	remoteAddr := getUDPAddr(DEFAULT_ADDRESS)
 	conn, err := net.ListenUDP("udp4", remoteAddr)
