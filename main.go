@@ -85,7 +85,7 @@ func hostGame(name string) {
 		if n == 1 {
 			/* Message was a join request: accept player */
 			DEBUG.Println("Acepting player", playerName)
-			conn.WriteToUDP([]byte(fmt.Sprintf(ACCEPT_MSG_FMT, name, playerName)), addr)
+			conn.WriteToUDP(fmt.Appendf(nil, ACCEPT_MSG_FMT, name, playerName), addr)
 			// TODO register {playerName, addr}
 		}
 	}
@@ -103,7 +103,7 @@ func joinGame(name string) {
 	DEBUG.Println(conn.LocalAddr(), "is connected to", conn.RemoteAddr())
 	defer conn.Close()
 
-	payload := []byte(fmt.Sprintf(JOIN_MSG_FMT, name))
+	payload := fmt.Appendf(nil, JOIN_MSG_FMT, name)
 	buffer := make([]byte, BUFFER_SIZE)
 	/* Dirty hack, but the only way I found to format only one flag */
 	replyFmt := fmt.Sprintf(ACCEPT_MSG_FMT, "%s", name)
