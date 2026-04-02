@@ -21,14 +21,15 @@ var ACCEPT_MSG_FMT = "%s welcomes %s"
 var DEBUG = log.New(os.Stderr, "[DEBUG] ", log.Lshortfile)
 var ERROR = log.New(os.Stderr, "[ERROR] ", log.LstdFlags|log.Lshortfile)
 
-func usage(execName string) {
-	os.Stderr.WriteString("Usage: " + execName + " ACTION NAME [PLAYER_COUNT]\n")
-	os.Stderr.WriteString("Where:\n")
-	os.Stderr.WriteString("\tACTION is either \"host\" or \"join\"\n")
-	os.Stderr.WriteString("\tNAME is a non-empty string defining the player name\n")
-	os.Stderr.WriteString("\tPLAYER_COUNT is a positive integer greater than 1 specifying the number\n")
-	os.Stderr.WriteString("\t             of players for the game; mandatory if ACTION is \"host\",\n")
-	os.Stderr.WriteString("\t             ignored otherwise\n")
+func usage() {
+	os.Stderr.WriteString("Usage: " + os.Args[0] + ` ACTION NAME [PLAYER_COUNT]
+Where:
+	ACTION is either "host" or "join"
+	NAME is a non-empty string defining the player name
+	PLAYER_COUNT is a positive integer greater than 1 specifying the number
+	             of players for the game; mandatory if ACTION is "host",
+	             ignored otherwise
+`)
 	os.Exit(1)
 }
 
@@ -43,24 +44,24 @@ func (p player) String() string {
 
 func main() {
 	if len(os.Args) < 3 {
-		usage(os.Args[0])
+		usage()
 	}
 	name := os.Args[2]
 	if name == "" {
 		DEBUG.Println("Empty name")
-		usage(os.Args[0])
+		usage()
 	}
 	action := os.Args[1]
 	switch action {
 	case "host":
 		if len(os.Args) == 3 {
 			DEBUG.Println("Missing player count")
-			usage(os.Args[0])
+			usage()
 		}
 		playerCount, err := strconv.Atoi(os.Args[3])
 		if err != nil || playerCount <= 1 {
 			DEBUG.Println("Invalid player count", os.Args[3])
-			usage(os.Args[0])
+			usage()
 		}
 
 		hostGame(name, playerCount)
@@ -68,7 +69,7 @@ func main() {
 		joinGame(name)
 	default:
 		DEBUG.Println("Unknown action", action)
-		usage(os.Args[0])
+		usage()
 	}
 }
 
