@@ -77,6 +77,7 @@ func getUDPAddr(address string) *net.UDPAddr {
 }
 
 func hostGame(name string, playerCount int) {
+	players := make([]player, playerCount)
 	DEBUG.Println("Hosting game")
 	remoteAddr := getUDPAddr(DEFAULT_ADDRESS)
 	conn, err := net.ListenUDP("udp4", remoteAddr)
@@ -86,6 +87,7 @@ func hostGame(name string, playerCount int) {
 	DEBUG.Println(conn.LocalAddr(), "is connected to", conn.RemoteAddr())
 	defer conn.Close()
 
+	players = append(players, player{name, conn.LocalAddr()})
 	buffer := make([]byte, BUFFER_SIZE)
 	for {
 		n, addr, err := conn.ReadFromUDP(buffer)
@@ -103,7 +105,7 @@ func hostGame(name string, playerCount int) {
 			/* Message was a join request: accept player */
 			DEBUG.Println("Acepting player", playerName)
 			conn.WriteToUDP(fmt.Appendf(nil, ACCEPT_MSG_FMT, name, playerName), addr)
-			// TODO register {playerName, addr}
+			players = append(players, player{playerName, addr})
 		}
 	}
 }
