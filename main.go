@@ -37,6 +37,10 @@ type player struct {
 	addr net.Addr
 }
 
+func (p player) String() string {
+	return p.name + "@" + p.addr.String()
+}
+
 func main() {
 	if len(os.Args) < 3 {
 		usage(os.Args[0])
