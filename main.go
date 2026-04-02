@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-const DEFAULT_ADDRESS = ":10042"
+const DEFAULT_PORT = 10042
 const BUFFER_SIZE = 256
 
 var JOIN_MSG_FMT = "%s wants to join"
@@ -72,18 +72,10 @@ func main() {
 	}
 }
 
-func getUDPAddr(address string) *net.UDPAddr {
-	udpAddr, err := net.ResolveUDPAddr("udp4", address)
-	if err != nil {
-		ERROR.Fatalln(err)
-	}
-	return udpAddr
-}
-
 func hostGame(name string, playerCount int) {
 	players := make([]player, 0, playerCount)
 	DEBUG.Println("Hosting game")
-	remoteAddr := getUDPAddr(DEFAULT_ADDRESS)
+	remoteAddr := &net.UDPAddr{Port: DEFAULT_PORT}
 	conn, err := net.ListenUDP("udp4", remoteAddr)
 	if err != nil {
 		ERROR.Fatalln(err)
@@ -119,8 +111,8 @@ func hostGame(name string, playerCount int) {
 
 func joinGame(name string) {
 	DEBUG.Println("Joining game")
-	localAddr := getUDPAddr(":0")
-	remoteAddr := getUDPAddr(DEFAULT_ADDRESS)
+	localAddr := &net.UDPAddr{Port: 0}
+	remoteAddr := &net.UDPAddr{Port: DEFAULT_PORT}
 	DEBUG.Println("local address =", localAddr, "; remote address =", remoteAddr)
 	conn, err := net.DialUDP("udp4", localAddr, remoteAddr)
 	if err != nil {
