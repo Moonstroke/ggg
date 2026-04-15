@@ -9,6 +9,7 @@ import (
 	"net"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -179,6 +180,39 @@ func recvJoinAck(conn *net.UDPConn, buffer []byte, replyFmt string) string {
 	return ""
 }
 
+func recvPlayerList(conn *net.UDPConn, buffer []byte, players *[]player) {
+	for {
+		conn.SetReadDeadline(time.Time{}) // TODO use proper time value
+		msgSize, _, err := conn.ReadFromUDP(buffer)
+		if err != nil {
+			ERROR.Println(err)
+			continue
+		}
+		msg := string(buffer[:msgSize])
+		DEBUG.Println("Received player data message:", msg)
+		if msg == PLAYER_DATA_END {
+			break
+		}
+		var playerRepr string
+		fmtCount, err := fmt.Sscanf(msg, PLAYER_DATA_FMT, &playerRepr)
+		if err != nil {
+			ERROR.Println(err)
+		}
+		if fmtCount == 1 {
+			playerName, playerAddrRepr, found := strings.Cut(playerRepr, "@")
+			if found {
+				playerAddr, err := net.ResolveUDPAddr("udp", playerAddrRepr)
+				if err != nil {
+					ERROR.Println(err)
+				}
+				*players = append(*players, player{playerName, playerAddr})
+				continue
+			}
+		}
+		ERROR.Println("Unrecognized player data message:", msg)
+	}
+}
+
 func joinGame(name string) {
 	DEBUG.Println("Joining game")
 	localAddr := &net.UDPAddr{Port: 0}
@@ -194,12 +228,19 @@ func joinGame(name string) {
 	buffer := make([]byte, BUFFER_SIZE)
 	/* Dirty hack, but the only way I found to format only one flag */
 	replyFmt := fmt.Sprintf(ACCEPT_MSG_FMT, "%s", name)
+	var hostName string
 	for {
 		sendJoinRequest(conn, name)
 		conn.SetReadDeadline(time.Now().Add(time.Second))
-		hostName := recvJoinAck(conn, buffer, replyFmt)
+		hostName = recvJoinAck(conn, buffer, replyFmt)
 		if hostName != "" {
 			break
 		}
 	}
+
+	players := make([]player, 0)
+	players = append(players, player{hostName, conn.RemoteAddr()})
+	players = append(players, player{name, localAddr})
+	recvPlayerList(conn, buffer, &players)
+	DEBUG.Println("players:", players)
 }
