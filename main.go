@@ -17,6 +17,8 @@ const BUFFER_SIZE = 256
 
 var JOIN_MSG_FMT = "%s wants to join"
 var ACCEPT_MSG_FMT = "%s welcomes %s"
+var PLAYER_DATA_FMT = "Other player: %s"
+var PLAYER_DATA_END = "No more players"
 
 var DEBUG = log.New(os.Stderr, "[DEBUG] ", log.Lshortfile)
 var ERROR = log.New(os.Stderr, "[ERROR] ", log.LstdFlags|log.Lshortfile)
@@ -95,6 +97,30 @@ func sendJoinAck(conn *net.UDPConn, addr *net.UDPAddr, name, playerName string) 
 	conn.WriteToUDP(fmt.Appendf(nil, ACCEPT_MSG_FMT, name, playerName), addr)
 }
 
+func sendPlayer(conn *net.UDPConn, player, otherPlayer *player) {
+	DEBUG.Println("Sending player", otherPlayer, "to", player)
+	conn.WriteTo(fmt.Appendf(nil, PLAYER_DATA_FMT, otherPlayer.String()), player.addr)
+}
+
+func sendListEnd(conn *net.UDPConn, player *player) {
+	DEBUG.Println("Sending player end to", player)
+	conn.WriteTo([]byte(PLAYER_DATA_END), player.addr)
+}
+
+func sendPlayerList(conn *net.UDPConn, players []player) {
+	/* Skip first player which is the host him-/herself. All players already know the host's address */
+	for i, player := range players[1:] {
+		i++ /* Increment i to match offset in slice players (skip host) */
+		for _, otherPlayer := range players[1:i] {
+			sendPlayer(conn, &player, &otherPlayer)
+		}
+		for _, otherPlayer := range players[i+1:] {
+			sendPlayer(conn, &player, &otherPlayer)
+		}
+		sendListEnd(conn, &player)
+	}
+}
+
 func hostGame(name string, playerCount int) {
 	players := make([]player, 0, playerCount)
 	DEBUG.Println("Hosting game")
@@ -120,6 +146,8 @@ func hostGame(name string, playerCount int) {
 			break
 		}
 	}
+	DEBUG.Println("players:", players)
+	sendPlayerList(conn, players)
 }
 
 func sendJoinRequest(conn *net.UDPConn, name string) {
