@@ -16,10 +16,10 @@ import (
 const DEFAULT_PORT = 10042
 const BUFFER_SIZE = 256
 
-var JOIN_MSG_FMT = "%s wants to join"
-var ACCEPT_MSG_FMT = "%s welcomes %s"
-var PLAYER_DATA_FMT = "Other player: %s"
-var PLAYER_DATA_END = "No more players"
+const JOIN_MSG_FMT = "%s wants to join"
+const ACCEPT_MSG_FMT = "%s welcomes %s"
+const PLAYER_DATA_FMT = "Other player: %s"
+const PLAYER_DATA_END = "No more players"
 
 var DEBUG = log.New(os.Stderr, "[DEBUG] ", log.Lshortfile)
 var ERROR = log.New(os.Stderr, "[ERROR] ", log.LstdFlags|log.Lshortfile)
