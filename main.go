@@ -4,11 +4,13 @@
 package main
 
 import (
+	"cmp"
 	"errors"
 	"fmt"
 	"log"
 	"net"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -52,6 +54,10 @@ func findCurrentNetAddr() (*net.IPNet, error) {
 		return nil, err
 	}
 	DEBUG.Println("Interfaces:", intfs)
+	cmpInterfacesByIndex := func(intf1, intf2 net.Interface) int {
+		return cmp.Compare(intf1.Index, intf2.Index)
+	}
+	slices.SortFunc(intfs, cmpInterfacesByIndex)
 
 	for _, intf := range intfs {
 		addrs, err := intf.Addrs()
