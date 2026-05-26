@@ -48,7 +48,7 @@ func (p player) String() string {
 	return p.name + "@" + p.addr.String()
 }
 
-func findCurrentNetAddr() (*net.IPNet, error) {
+func findCurrentNetAddr() (net.IP, error) {
 	intfs, err := net.Interfaces()
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func findCurrentNetAddr() (*net.IPNet, error) {
 		if intf.Flags & ^net.FlagLoopback & net.FlagRunning != 0 {
 			for _, addr := range addrs {
 				if ip, ok := addr.(*net.IPNet); ok && !ip.IP.IsLoopback() {
-					return ip, nil
+					return ip.IP, nil
 				}
 			}
 		}
