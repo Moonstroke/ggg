@@ -156,6 +156,11 @@ func sendPlayerList(conn *net.UDPConn, players []player) {
 func hostGame(name string, playerCount int) {
 	players := make([]player, 0, playerCount)
 	DEBUG.Println("Hosting game")
+	localIP, err := findCurrentNetAddr()
+	if err != nil {
+		ERROR.Fatalln(err)
+	}
+	DEBUG.Println("Local IP address:", localIP)
 	remoteAddr := &net.UDPAddr{Port: DEFAULT_PORT}
 	conn, err := net.ListenUDP("udp4", remoteAddr)
 	if err != nil {
@@ -246,6 +251,11 @@ func recvPlayerList(conn *net.UDPConn, buffer []byte, players *[]player) {
 
 func joinGame(name string) {
 	DEBUG.Println("Joining game")
+	localIP, err := findCurrentNetAddr()
+	if err != nil {
+		ERROR.Fatalln(err)
+	}
+	DEBUG.Println("Local IP address:", localIP)
 	localAddr := &net.UDPAddr{Port: 0}
 	remoteAddr := &net.UDPAddr{Port: DEFAULT_PORT}
 	DEBUG.Println("local address =", localAddr, "; remote address =", remoteAddr)
