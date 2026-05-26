@@ -4,6 +4,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -43,6 +44,30 @@ type player struct {
 
 func (p player) String() string {
 	return p.name + "@" + p.addr.String()
+}
+
+func findCurrentNetAddr() (*net.IPNet, error) {
+	intfs, err := net.Interfaces()
+	if err != nil {
+		return nil, err
+	}
+	DEBUG.Println("Interfaces:", intfs)
+
+	for _, intf := range intfs {
+		addrs, err := intf.Addrs()
+		if err != nil {
+			return nil, err
+		}
+		DEBUG.Println("Addresses of interface", intf, ":", addrs)
+		if intf.Flags & ^net.FlagLoopback & net.FlagRunning != 0 {
+			for _, addr := range addrs {
+				if ip, ok := addr.(*net.IPNet); ok && !ip.IP.IsLoopback() {
+					return ip, nil
+				}
+			}
+		}
+	}
+	return nil, errors.New("no interface is connected to a network")
 }
 
 func main() {
