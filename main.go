@@ -67,7 +67,7 @@ func findCurrentNetAddr() (net.IP, error) {
 		DEBUG.Println("Addresses of interface", intf, ":", addrs)
 		if intf.Flags & ^net.FlagLoopback & net.FlagRunning != 0 {
 			for _, addr := range addrs {
-				if ip, ok := addr.(*net.IPNet); ok && !ip.IP.IsLoopback() {
+				if ip, ok := addr.(*net.IPNet); ok && !ip.IP.IsLoopback() && ip.IP.To4() != nil {
 					return ip.IP, nil
 				}
 			}
