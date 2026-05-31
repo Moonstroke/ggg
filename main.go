@@ -112,7 +112,8 @@ func main() {
 func recvJoinRequest(conn *net.UDPConn, buffer []byte) (string, *net.UDPAddr) {
 	n, addr, err := conn.ReadFromUDP(buffer)
 	if err != nil {
-		ERROR.Fatalln(err)
+		ERROR.Println(err)
+		return "", nil
 	}
 	msg := string(buffer[:n])
 	DEBUG.Println("Received", msg, "from", addr)
