@@ -272,6 +272,13 @@ func joinGame(name string) {
 	DEBUG.Println(conn.LocalAddr(), "is connected to", conn.RemoteAddr())
 	defer conn.Close()
 
+	listenConn, err := net.ListenUDP("udp4", &net.UDPAddr{Port: DEFAULT_PORT})
+	if err != nil {
+		ERROR.Fatalln(err)
+	}
+	DEBUG.Println("Listening on", listenConn.RemoteAddr())
+	defer listenConn.Close()
+
 	buffer := make([]byte, BUFFER_SIZE)
 	/* Dirty hack, but the only way I found to format only one flag */
 	replyFmt := fmt.Sprintf(ACCEPT_MSG_FMT, "%s", name)
@@ -280,7 +287,7 @@ func joinGame(name string) {
 	for {
 		sendJoinRequest(conn, name)
 		conn.SetReadDeadline(time.Now().Add(time.Second))
-		hostName, hostAddr = recvJoinAck(conn, buffer, replyFmt)
+		hostName, hostAddr = recvJoinAck(listenConn, buffer, replyFmt)
 		if hostName != "" {
 			break
 		}
