@@ -197,26 +197,27 @@ func sendJoinRequest(conn *net.UDPConn, name string) {
 	}
 }
 
-func recvJoinAck(conn *net.UDPConn, buffer []byte, replyFmt string) string {
+func recvJoinAck(conn *net.UDPConn, buffer []byte, replyFmt string) (string, net.Addr) {
 	var n int
+	var addr *net.UDPAddr
 	var err error
-	if n, _, err = conn.ReadFromUDP(buffer); err != nil {
+	if n, addr, err = conn.ReadFromUDP(buffer); err != nil {
 		ERROR.Println(err)
-		return ""
+		return "", nil
 	}
 	reply := string(buffer[:n])
-	DEBUG.Println("Received", reply, "from", conn.RemoteAddr())
+	DEBUG.Println("Received", reply, "from", addr)
 	var hostName string
 	if n, err = fmt.Sscanf(reply, replyFmt, &hostName); err != nil {
 		ERROR.Println(err)
-		return ""
+		return "", nil
 	}
 	if n == 1 {
 		/* Host accepted our request */
 		DEBUG.Println("Join request accepted by host", hostName, "@", conn.RemoteAddr())
-		return hostName
+		return hostName, conn.RemoteAddr()
 	}
-	return ""
+	return "", nil
 }
 
 func recvPlayerList(conn *net.UDPConn, buffer []byte, players *[]player) {
@@ -275,17 +276,18 @@ func joinGame(name string) {
 	/* Dirty hack, but the only way I found to format only one flag */
 	replyFmt := fmt.Sprintf(ACCEPT_MSG_FMT, "%s", name)
 	var hostName string
+	var hostAddr net.Addr
 	for {
 		sendJoinRequest(conn, name)
 		conn.SetReadDeadline(time.Now().Add(time.Second))
-		hostName = recvJoinAck(conn, buffer, replyFmt)
+		hostName, hostAddr = recvJoinAck(conn, buffer, replyFmt)
 		if hostName != "" {
 			break
 		}
 	}
 
 	players := make([]player, 0)
-	players = append(players, player{hostName, conn.RemoteAddr()})
+	players = append(players, player{hostName, hostAddr})
 	players = append(players, player{name, conn.LocalAddr()})
 	recvPlayerList(conn, buffer, &players)
 	DEBUG.Println("players:", players)
