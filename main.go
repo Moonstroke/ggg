@@ -286,7 +286,7 @@ func joinGame(name string) {
 	var hostAddr net.Addr
 	for {
 		sendJoinRequest(conn, name)
-		conn.SetReadDeadline(time.Now().Add(time.Second))
+		listenConn.SetReadDeadline(time.Now().Add(time.Second))
 		hostName, hostAddr = recvJoinAck(listenConn, buffer, replyFmt)
 		if hostName != "" {
 			break
