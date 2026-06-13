@@ -117,6 +117,7 @@ func recvJoinRequest(conn *net.UDPConn, buffer []byte) (string, *net.UDPAddr) {
 	}
 	msg := string(buffer[:n])
 	DEBUG.Println("Received", msg, "from", addr)
+	addr.Port = DEFAULT_PORT
 	var playerName string
 	if n, err = fmt.Sscanf(msg, JOIN_MSG_FMT, &playerName); err != nil {
 		ERROR.Println(err)
