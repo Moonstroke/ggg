@@ -214,8 +214,8 @@ func recvJoinAck(conn *net.UDPConn, buffer []byte, replyFmt string) (string, net
 	}
 	if n == 1 {
 		/* Host accepted our request */
-		DEBUG.Println("Join request accepted by host", hostName, "@", conn.RemoteAddr())
-		return hostName, conn.RemoteAddr()
+		DEBUG.Println("Join request accepted by host", hostName, "@", addr)
+		return hostName, addr
 	}
 	return "", nil
 }
