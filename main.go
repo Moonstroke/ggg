@@ -223,7 +223,7 @@ func recvJoinAck(conn *net.UDPConn, buffer []byte, replyFmt string) (string, net
 
 func recvPlayerList(conn *net.UDPConn, buffer []byte, players *[]player) {
 	for {
-		conn.SetReadDeadline(time.Time{}) // TODO use proper time value
+		conn.SetReadDeadline(time.Now().Add(time.Second))
 		msgSize, _, err := conn.ReadFromUDP(buffer)
 		if err != nil {
 			ERROR.Println(err)
