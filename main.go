@@ -262,8 +262,7 @@ func joinGame(name string) {
 	}
 	DEBUG.Println("Local IP address:", localIP)
 	localAddr := &net.UDPAddr{IP: localIP, Port: 0}
-	broadcastIP := slices.Clone(localIP)
-	broadcastIP[3] = 0xff
+	broadcastIP := net.IP{255, 255, 255, 255}
 	remoteAddr := &net.UDPAddr{IP: broadcastIP, Port: DEFAULT_PORT}
 	DEBUG.Println("local address =", localAddr, "; remote address =", remoteAddr)
 	conn, err := net.DialUDP("udp4", localAddr, remoteAddr)
