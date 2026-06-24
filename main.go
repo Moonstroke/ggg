@@ -4,13 +4,10 @@
 package main
 
 import (
-	"cmp"
-	"errors"
 	"fmt"
 	"log"
 	"net"
 	"os"
-	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -46,36 +43,6 @@ type player struct {
 
 func (p player) String() string {
 	return p.name + "@" + p.addr.String()
-}
-
-func findCurrentNetAddr() (net.IP, error) {
-	intfs, err := net.Interfaces()
-	if err != nil {
-		return nil, err
-	}
-	DEBUG.Println("Interfaces:", intfs)
-	cmpInterfacesByIndex := func(intf1, intf2 net.Interface) int {
-		return cmp.Compare(intf1.Index, intf2.Index)
-	}
-	slices.SortFunc(intfs, cmpInterfacesByIndex)
-
-	for _, intf := range intfs {
-		addrs, err := intf.Addrs()
-		if err != nil {
-			return nil, err
-		}
-		DEBUG.Println("Addresses of interface", intf, ":", addrs)
-		if intf.Flags & ^net.FlagLoopback & net.FlagRunning != 0 {
-			for _, addr := range addrs {
-				if ip, ok := addr.(*net.IPNet); ok && !ip.IP.IsLoopback() {
-					if ip4 := ip.IP.To4(); ip4 != nil {
-						return ip4, nil
-					}
-				}
-			}
-		}
-	}
-	return nil, errors.New("no interface is connected to a network")
 }
 
 func main() {
@@ -160,11 +127,6 @@ func sendPlayerList(conn *net.UDPConn, players []player) {
 func hostGame(name string, playerCount int) {
 	players := make([]player, 0, playerCount)
 	DEBUG.Println("Hosting game")
-	localIP, err := findCurrentNetAddr()
-	if err != nil {
-		ERROR.Fatalln(err)
-	}
-	DEBUG.Println("Local IP address:", localIP)
 	remoteAddr := &net.UDPAddr{Port: DEFAULT_PORT}
 	conn, err := net.ListenUDP("udp4", remoteAddr)
 	if err != nil {
@@ -256,11 +218,6 @@ func recvPlayerList(conn *net.UDPConn, buffer []byte, players *[]player) {
 
 func joinGame(name string) {
 	DEBUG.Println("Joining game")
-	localIP, err := findCurrentNetAddr()
-	if err != nil {
-		ERROR.Fatalln(err)
-	}
-	DEBUG.Println("Local IP address:", localIP)
 	localAddr := &net.UDPAddr{Port: 0}
 	broadcastIP := net.IP{255, 255, 255, 255}
 	remoteAddr := &net.UDPAddr{IP: broadcastIP, Port: DEFAULT_PORT}
