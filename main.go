@@ -132,7 +132,6 @@ func hostGame(name string, playerCount int) {
 	if err != nil {
 		ERROR.Fatalln(err)
 	}
-	DEBUG.Println(conn.LocalAddr(), "is connected to", conn.RemoteAddr())
 	defer conn.Close()
 
 	players = append(players, player{name, conn.LocalAddr()})
@@ -221,7 +220,6 @@ func joinGame(name string) {
 	localAddr := &net.UDPAddr{Port: 0}
 	broadcastIP := net.IP{255, 255, 255, 255}
 	remoteAddr := &net.UDPAddr{IP: broadcastIP, Port: DEFAULT_PORT}
-	DEBUG.Println("local address =", localAddr, "; remote address =", remoteAddr)
 	conn, err := net.DialUDP("udp4", localAddr, remoteAddr)
 	if err != nil {
 		ERROR.Fatalln(err)
@@ -233,7 +231,6 @@ func joinGame(name string) {
 	if err != nil {
 		ERROR.Fatalln(err)
 	}
-	DEBUG.Println("Listening on", listenConn.RemoteAddr())
 	defer listenConn.Close()
 
 	buffer := make([]byte, BUFFER_SIZE)
