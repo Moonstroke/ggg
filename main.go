@@ -261,7 +261,7 @@ func joinGame(name string) {
 		ERROR.Fatalln(err)
 	}
 	DEBUG.Println("Local IP address:", localIP)
-	localAddr := &net.UDPAddr{IP: localIP, Port: 0}
+	localAddr := &net.UDPAddr{Port: 0}
 	broadcastIP := net.IP{255, 255, 255, 255}
 	remoteAddr := &net.UDPAddr{IP: broadcastIP, Port: DEFAULT_PORT}
 	DEBUG.Println("local address =", localAddr, "; remote address =", remoteAddr)
