@@ -297,6 +297,6 @@ func joinGame(name string) {
 	players := make([]player, 0)
 	players = append(players, player{hostName, hostAddr})
 	players = append(players, player{name, conn.LocalAddr()})
-	recvPlayerList(conn, buffer, &players)
+	recvPlayerList(listenConn, buffer, &players)
 	DEBUG.Println("players:", players)
 }
