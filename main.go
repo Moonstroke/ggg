@@ -217,10 +217,8 @@ func recvPlayerList(conn *net.UDPConn, buffer []byte, players *[]player) {
 
 func joinGame(name string) {
 	DEBUG.Println("Joining game")
-	localAddr := &net.UDPAddr{Port: 0}
-	broadcastIP := net.IP{255, 255, 255, 255}
-	remoteAddr := &net.UDPAddr{IP: broadcastIP, Port: DEFAULT_PORT}
-	conn, err := net.DialUDP("udp4", localAddr, remoteAddr)
+	remoteAddr := &net.UDPAddr{IP: net.IPv4bcast, Port: DEFAULT_PORT}
+	conn, err := net.DialUDP("udp4", nil, remoteAddr)
 	if err != nil {
 		ERROR.Fatalln(err)
 	}
