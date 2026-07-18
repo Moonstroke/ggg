@@ -8,6 +8,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -167,7 +168,7 @@ func recvJoinAck(conn *net.UDPConn, buffer []byte, replyFmt string, localAddr ne
 		ERROR.Println(err)
 		return "", nil
 	}
-	if addr.String() == localAddr.String() {
+	if reflect.DeepEqual(addr, localAddr) {
 		/* Ignore self messages */
 		return "", nil
 	}
