@@ -159,12 +159,16 @@ func sendJoinRequest(conn *net.UDPConn, name string) {
 	}
 }
 
-func recvJoinAck(conn *net.UDPConn, buffer []byte, replyFmt string) (string, net.Addr) {
+func recvJoinAck(conn *net.UDPConn, buffer []byte, replyFmt string, localAddr net.Addr) (string, net.Addr) {
 	var n int
 	var addr *net.UDPAddr
 	var err error
 	if n, addr, err = conn.ReadFromUDP(buffer); err != nil {
 		ERROR.Println(err)
+		return "", nil
+	}
+	if addr.String() == localAddr.String() {
+		/* Ignore self messages */
 		return "", nil
 	}
 	reply := string(buffer[:n])
@@ -239,7 +243,7 @@ func joinGame(name string) {
 	for {
 		sendJoinRequest(conn, name)
 		listenConn.SetReadDeadline(time.Now().Add(time.Second))
-		hostName, hostAddr = recvJoinAck(listenConn, buffer, replyFmt)
+		hostName, hostAddr = recvJoinAck(listenConn, buffer, replyFmt, conn.LocalAddr())
 		if hostName != "" {
 			break
 		}
