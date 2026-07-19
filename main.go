@@ -19,6 +19,7 @@ const BUFFER_SIZE = 256
 
 const JOIN_MSG_FMT = "%s wants to join"
 const ACCEPT_MSG_FMT = "%s welcomes %s"
+const ACK_ACCEPT_MSG_FMT = "%s thanks %s"
 const PLAYER_DATA_FMT = "Other player: %s"
 const PLAYER_DATA_END = "No more players"
 
@@ -158,6 +159,9 @@ func hostGame(name string, playerCount int) {
 		DEBUG.Println("Acepting player", player.name)
 
 		sendJoinAck(conn, player, name)
+		// TODO receive player acceptance acknowledgement (3-way handshake)
+		//      This requires redesigning the listening loop entirely
+		//      to process incoming messages in an event-driven way
 		players = append(players, player)
 		if len(players) == playerCount {
 			break
@@ -200,6 +204,13 @@ func recvJoinAck(conn *net.UDPConn, buffer []byte, replyFmt string, localAddr ne
 		return host
 	}
 	return nil
+}
+
+func sendAckAck(conn *net.UDPConn, name string, host *player) {
+	payload := fmt.Appendf(nil, ACK_ACCEPT_MSG_FMT, name, host.name)
+	if _, err := conn.WriteTo(payload, host.addr); err != nil {
+		ERROR.Fatalln(err)
+	}
 }
 
 func recvPlayerList(conn *net.UDPConn, buffer []byte, players []*player) {
@@ -256,6 +267,7 @@ func joinGame(name string) {
 		listenConn.SetReadDeadline(time.Now().Add(time.Second))
 		host = recvJoinAck(listenConn, buffer, replyFmt, conn.LocalAddr())
 		if host != nil {
+			sendAckAck(conn, name, host)
 			break
 		}
 	}
