@@ -189,7 +189,7 @@ func recvJoinAck(conn *net.UDPConn, buffer []byte, replyFmt string, localAddr ne
 	return nil
 }
 
-func recvPlayerList(conn *net.UDPConn, buffer []byte, players *[]player) {
+func recvPlayerList(conn *net.UDPConn, buffer []byte, players []player) {
 	for {
 		conn.SetReadDeadline(time.Now().Add(time.Second))
 		msgSize, _, err := conn.ReadFromUDP(buffer)
@@ -254,6 +254,6 @@ func joinGame(name string) {
 	players := make([]player, 0)
 	players = append(players, *host)
 	players = append(players, player{name, conn.LocalAddr()})
-	recvPlayerList(listenConn, buffer, &players)
+	recvPlayerList(listenConn, buffer, players)
 	DEBUG.Println("players:", players)
 }
