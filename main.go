@@ -195,9 +195,9 @@ func recvJoinAck(conn *net.UDPConn, buffer []byte, replyFmt string, localAddr ne
 	}
 	if n == 1 {
 		/* Host accepted our request */
-		host := player{hostName, addr}
-		DEBUG.Println("Join request accepted by host", hostName, "@", addr)
-		return &host
+		host := &player{hostName, addr}
+		DEBUG.Println("Join request accepted by host", host.String())
+		return host
 	}
 	return nil
 }
