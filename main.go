@@ -77,7 +77,7 @@ func main() {
 	}
 }
 
-func recvJoinRequest(conn *net.UDPConn, buffer []byte) (string, *net.UDPAddr) {
+func recvJoinRequest(conn *net.UDPConn, buffer []byte) (string, net.Addr) {
 	n, addr, err := conn.ReadFromUDP(buffer)
 	if err != nil {
 		ERROR.Println(err)
@@ -97,8 +97,8 @@ func recvJoinRequest(conn *net.UDPConn, buffer []byte) (string, *net.UDPAddr) {
 	return playerName, addr
 }
 
-func sendJoinAck(conn *net.UDPConn, addr *net.UDPAddr, name, playerName string) {
-	conn.WriteToUDP(fmt.Appendf(nil, ACCEPT_MSG_FMT, name, playerName), addr)
+func sendJoinAck(conn *net.UDPConn, addr net.Addr, name, playerName string) {
+	conn.WriteTo(fmt.Appendf(nil, ACCEPT_MSG_FMT, name, playerName), addr)
 }
 
 func sendPlayer(conn *net.UDPConn, player, otherPlayer *player) {
