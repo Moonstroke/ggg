@@ -111,22 +111,22 @@ func sendListEnd(conn *net.UDPConn, player *player) {
 	conn.WriteTo([]byte(PLAYER_DATA_END), player.addr)
 }
 
-func sendPlayerList(conn *net.UDPConn, players []player) {
+func sendPlayerList(conn *net.UDPConn, players []*player) {
 	/* Skip first player which is the host him-/herself. All players already know the host's address */
 	for i, player := range players[1:] {
 		i++ /* Increment i to match offset in slice players (skip host) */
 		for _, otherPlayer := range players[1:i] {
-			sendPlayer(conn, &player, &otherPlayer)
+			sendPlayer(conn, player, otherPlayer)
 		}
 		for _, otherPlayer := range players[i+1:] {
-			sendPlayer(conn, &player, &otherPlayer)
+			sendPlayer(conn, player, otherPlayer)
 		}
-		sendListEnd(conn, &player)
+		sendListEnd(conn, player)
 	}
 }
 
 func hostGame(name string, playerCount int) {
-	players := make([]player, 0, playerCount)
+	players := make([]*player, 0, playerCount)
 	DEBUG.Println("Hosting game")
 	remoteAddr := &net.UDPAddr{Port: DEFAULT_PORT}
 	conn, err := net.ListenUDP("udp4", remoteAddr)
@@ -135,7 +135,7 @@ func hostGame(name string, playerCount int) {
 	}
 	defer conn.Close()
 
-	players = append(players, player{name, conn.LocalAddr()})
+	players = append(players, &player{name, conn.LocalAddr()})
 	buffer := make([]byte, BUFFER_SIZE)
 	for {
 		player := recvJoinRequest(conn, buffer)
@@ -145,7 +145,7 @@ func hostGame(name string, playerCount int) {
 		DEBUG.Println("Acepting player", player.name)
 
 		sendJoinAck(conn, player, name)
-		players = append(players, *player)
+		players = append(players, player)
 		if len(players) == playerCount {
 			break
 		}
@@ -189,7 +189,7 @@ func recvJoinAck(conn *net.UDPConn, buffer []byte, replyFmt string, localAddr ne
 	return nil
 }
 
-func recvPlayerList(conn *net.UDPConn, buffer []byte, players []player) {
+func recvPlayerList(conn *net.UDPConn, buffer []byte, players []*player) {
 	for {
 		conn.SetReadDeadline(time.Now().Add(time.Second))
 		msgSize, _, err := conn.ReadFromUDP(buffer)
@@ -214,7 +214,7 @@ func recvPlayerList(conn *net.UDPConn, buffer []byte, players []player) {
 				if err != nil {
 					ERROR.Println(err)
 				}
-				*players = append(*players, player{playerName, playerAddr})
+				players = append(players, &player{playerName, playerAddr})
 				continue
 			}
 		}
@@ -251,9 +251,9 @@ func joinGame(name string) {
 		}
 	}
 
-	players := make([]player, 0)
-	players = append(players, *host)
-	players = append(players, player{name, conn.LocalAddr()})
+	players := make([]*player, 0)
+	players = append(players, host)
+	players = append(players, &player{name, conn.LocalAddr()})
 	recvPlayerList(listenConn, buffer, players)
 	DEBUG.Println("players:", players)
 }
