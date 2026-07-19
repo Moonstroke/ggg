@@ -46,6 +46,19 @@ func (p *player) String() string {
 	return p.name + "@" + p.addr.String()
 }
 
+func parse(playerRepr string) *player {
+	playerName, playerAddrRepr, found := strings.Cut(playerRepr, "@")
+	if !found {
+		return nil
+	}
+	playerAddr, err := net.ResolveUDPAddr("udp", playerAddrRepr)
+	if err != nil {
+		ERROR.Println(err)
+		return nil
+	}
+	return &player{playerName, playerAddr}
+}
+
 func main() {
 	if len(os.Args) < 3 {
 		usage()
@@ -208,13 +221,9 @@ func recvPlayerList(conn *net.UDPConn, buffer []byte, players []*player) {
 			ERROR.Println(err)
 		}
 		if fmtCount == 1 {
-			playerName, playerAddrRepr, found := strings.Cut(playerRepr, "@")
-			if found {
-				playerAddr, err := net.ResolveUDPAddr("udp", playerAddrRepr)
-				if err != nil {
-					ERROR.Println(err)
-				}
-				players = append(players, &player{playerName, playerAddr})
+			player := parse(playerRepr)
+			if player != nil {
+				players = append(players, player)
 				continue
 			}
 		}
