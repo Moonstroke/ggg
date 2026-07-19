@@ -77,11 +77,11 @@ func main() {
 	}
 }
 
-func recvJoinRequest(conn *net.UDPConn, buffer []byte) (string, net.Addr) {
+func recvJoinRequest(conn *net.UDPConn, buffer []byte) *player {
 	n, addr, err := conn.ReadFromUDP(buffer)
 	if err != nil {
 		ERROR.Println(err)
-		return "", nil
+		return nil
 	}
 	msg := string(buffer[:n])
 	DEBUG.Println("Received", msg, "from", addr)
@@ -89,12 +89,12 @@ func recvJoinRequest(conn *net.UDPConn, buffer []byte) (string, net.Addr) {
 	var playerName string
 	if n, err = fmt.Sscanf(msg, JOIN_MSG_FMT, &playerName); err != nil {
 		ERROR.Println(err)
-		return "", nil
+		return nil
 	}
 	if n != 1 {
-		return "", nil
+		return nil
 	}
-	return playerName, addr
+	return &player{playerName, addr}
 }
 
 func sendJoinAck(conn *net.UDPConn, player *player, name string) {
@@ -138,15 +138,14 @@ func hostGame(name string, playerCount int) {
 	players = append(players, player{name, conn.LocalAddr()})
 	buffer := make([]byte, BUFFER_SIZE)
 	for {
-		playerName, playerAddr := recvJoinRequest(conn, buffer)
-		if playerName == "" {
+		player := recvJoinRequest(conn, buffer)
+		if player == nil {
 			continue
 		}
-		player := player{playerName, playerAddr}
-		DEBUG.Println("Acepting player", playerName)
+		DEBUG.Println("Acepting player", player.name)
 
-		sendJoinAck(conn, &player, name)
-		players = append(players, player)
+		sendJoinAck(conn, player, name)
+		players = append(players, *player)
 		if len(players) == playerCount {
 			break
 		}
@@ -162,31 +161,32 @@ func sendJoinRequest(conn *net.UDPConn, name string) {
 	}
 }
 
-func recvJoinAck(conn *net.UDPConn, buffer []byte, replyFmt string, localAddr net.Addr) (string, net.Addr) {
+func recvJoinAck(conn *net.UDPConn, buffer []byte, replyFmt string, localAddr net.Addr) *player {
 	var n int
 	var addr *net.UDPAddr
 	var err error
 	if n, addr, err = conn.ReadFromUDP(buffer); err != nil {
 		ERROR.Println(err)
-		return "", nil
+		return nil
 	}
 	if reflect.DeepEqual(addr, localAddr) {
 		/* Ignore self messages */
-		return "", nil
+		return nil
 	}
 	reply := string(buffer[:n])
 	DEBUG.Println("Received", reply, "from", addr)
 	var hostName string
 	if n, err = fmt.Sscanf(reply, replyFmt, &hostName); err != nil {
 		ERROR.Println(err)
-		return "", nil
+		return nil
 	}
 	if n == 1 {
 		/* Host accepted our request */
+		host := player{hostName, addr}
 		DEBUG.Println("Join request accepted by host", hostName, "@", addr)
-		return hostName, addr
+		return &host
 	}
-	return "", nil
+	return nil
 }
 
 func recvPlayerList(conn *net.UDPConn, buffer []byte, players *[]player) {
@@ -241,19 +241,18 @@ func joinGame(name string) {
 	buffer := make([]byte, BUFFER_SIZE)
 	/* Dirty hack, but the only way I found to format only one flag */
 	replyFmt := fmt.Sprintf(ACCEPT_MSG_FMT, "%s", name)
-	var host player
+	var host *player
 	for {
 		sendJoinRequest(conn, name)
 		listenConn.SetReadDeadline(time.Now().Add(time.Second))
-		hostName, hostAddr := recvJoinAck(listenConn, buffer, replyFmt, conn.LocalAddr())
-		if hostName != "" {
-			host = player{hostName, hostAddr}
+		host = recvJoinAck(listenConn, buffer, replyFmt, conn.LocalAddr())
+		if host != nil {
 			break
 		}
 	}
 
 	players := make([]player, 0)
-	players = append(players, host)
+	players = append(players, *host)
 	players = append(players, player{name, conn.LocalAddr()})
 	recvPlayerList(listenConn, buffer, &players)
 	DEBUG.Println("players:", players)
