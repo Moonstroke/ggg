@@ -42,7 +42,7 @@ type player struct {
 	addr net.Addr
 }
 
-func (p player) String() string {
+func (p *player) String() string {
 	return p.name + "@" + p.addr.String()
 }
 
