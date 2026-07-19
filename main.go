@@ -139,7 +139,7 @@ func hostGame(name string, playerCount int) {
 	buffer := make([]byte, BUFFER_SIZE)
 	for {
 		playerName, addr := recvJoinRequest(conn, buffer)
-		if addr == nil {
+		if playerName == "" {
 			continue
 		}
 		DEBUG.Println("Acepting player", playerName)
